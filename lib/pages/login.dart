@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hoot/assets/colors.dart';
+import 'package:hoot/assets/constants.dart';
+import 'package:hoot/assets/styles.dart';
+import 'package:hoot/models/hoot_user.dart';
+import 'package:hoot/services/auth.dart';
+import 'package:hoot/views/loading_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -7,8 +12,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // final AuthService _auth = AuthService();
+  final AuthService _auth = AuthService.getInstance();
   final _formKey = GlobalKey<FormState>();
+  bool _checked = false;
 
   String _email = '';
   String _password = '';
@@ -47,11 +53,13 @@ class _LoginPageState extends State<LoginPage> {
           TextFormField(
             validator: (val) => val.isEmpty ? 'Enter your email.' : null,
             decoration: InputDecoration(
-              border: OutlineInputBorder(),
               hintText: 'Email',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.all(largePadding),
             ),
             onChanged: (val) {
-              setState(() => _email = val);
+              _email = val;
+              if (_checked) _formKey.currentState.validate();
             },
             textInputAction: TextInputAction.next,
             onEditingComplete: () => focus.nextFocus(),
@@ -60,11 +68,13 @@ class _LoginPageState extends State<LoginPage> {
           TextFormField(
             validator: (val) => val.isEmpty ? 'Enter your password.' : null,
             decoration: InputDecoration(
-              border: OutlineInputBorder(),
               hintText: 'Password',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.all(largePadding),
             ),
             onChanged: (val) {
-              setState(() => _password = val);
+              _password = val;
+              if (_checked) _formKey.currentState.validate();
             },
             textInputAction: TextInputAction.done,
             onEditingComplete: () => focus.unfocus(),
@@ -72,9 +82,10 @@ class _LoginPageState extends State<LoginPage> {
             obscureText: true,
           ),
           SizedBox(height: 32),
-          ElevatedButton(
+          TextButton(
             onPressed: () async => _onSignInPressed(),
             child: Text('Log In'),
+            style: defaultButtonStyle,
           ),
           SizedBox(height: 16),
           TextButton(
@@ -99,17 +110,24 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onSignInPressed() async {
+    _checked = true;
     FocusScope.of(context).unfocus();
     if (_formKey.currentState.validate()) {
-      print('no problem');
-      /*
-      showDialog(context: context, builder: (context) => LoadingDialog());
-      FrostUser user = await _auth.signIn(email, password);
+      showDialog(
+        context: context,
+        builder: (context) => LoadingDialog(),
+      );
+      HootUser user = await _auth.signIn(_email, _password);
       Navigator.pop(context);
       if (user == null) {
         final snackBar = SnackBar(
-          content: Text('Error'),
+          backgroundColor: errorColor,
+          content: Text(
+            'Error',
+            style: TextStyle(color: foregroundColor),
+          ),
           action: SnackBarAction(
+            textColor: foregroundColor,
             label: 'Dismiss',
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -118,8 +136,9 @@ class _LoginPageState extends State<LoginPage> {
         );
 
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      } else {
+        print('Successful!');
       }
-      */
     }
   }
 }
