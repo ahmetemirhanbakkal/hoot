@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hoot/assets/colors.dart';
 import 'package:hoot/assets/styles.dart';
+import 'package:hoot/pages/home.dart';
 import 'package:hoot/pages/loading.dart';
 import 'package:hoot/pages/login.dart';
 
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoadingPage(),
         '/login': (context) => LoginPage(),
+        '/home': (context) => HomePage(),
       },
       theme: ThemeData(
         brightness: Brightness.dark,
@@ -27,7 +30,15 @@ class MyApp extends StatelessWidget {
         accentColor: secondaryColor,
         splashColor: splashColor,
         scaffoldBackgroundColor: primaryColor,
+        canvasColor: primaryColorDark,
         errorColor: errorColor,
+        popupMenuTheme: PopupMenuThemeData(
+          color: primaryColorDark,
+        ),
+        appBarTheme: AppBarTheme(
+          color: primaryColorDark,
+          elevation: 0,
+        ),
         textSelectionTheme: TextSelectionThemeData(
           cursorColor: secondaryColor,
         ),
@@ -42,6 +53,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
         textButtonTheme: TextButtonThemeData(style: textButtonStyle),
+        splashFactory: InkRipple.splashFactory,
+        highlightColor: Colors.transparent,
       ),
     );
   }

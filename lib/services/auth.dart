@@ -12,7 +12,7 @@ class AuthService {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   HootUser _toHootUser(User user) {
-    return user == null ? null : HootUser(uid: user.uid);
+    return user == null ? null : HootUser(uid: user.uid, email: user.email);
   }
 
   Future<HootUser> signIn(String email, String password) async {
@@ -32,5 +32,6 @@ class AuthService {
           break;
       }
     }
+    return null;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hoot/assets/colors.dart';
 import 'package:hoot/assets/constants.dart';
 import 'package:hoot/assets/styles.dart';
@@ -21,6 +22,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: primaryColor,
+    ));
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -137,7 +142,8 @@ class _LoginPageState extends State<LoginPage> {
 
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       } else {
-        print('Successful!');
+        Map arguments = {'user': user};
+        Navigator.pushReplacementNamed(context, '/home', arguments: arguments);
       }
     }
   }
