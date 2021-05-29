@@ -43,10 +43,19 @@ class AuthService {
     String username,
     String password,
   ) async {
-    UserCredential credential = await auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    return _toHootUser(credential.user);
+    try {
+      UserCredential credential = await auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return _toHootUser(credential.user);
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'email-already-in-use':
+          print('This e-mail is used.');
+          break;
+      }
+    }
+    return null;
   }
 }

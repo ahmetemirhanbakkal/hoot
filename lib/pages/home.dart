@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:hoot/assets/colors.dart';
 import 'package:hoot/assets/constants.dart';
 import 'package:hoot/models/hoot_user.dart';
+import 'package:hoot/pages/login.dart';
 import 'package:hoot/views/destination.dart';
 
 class HomePage extends StatefulWidget {
