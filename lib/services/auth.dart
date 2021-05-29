@@ -15,7 +15,10 @@ class AuthService {
     return user == null ? null : HootUser(uid: user.uid, email: user.email);
   }
 
-  Future<HootUser> signIn(String email, String password) async {
+  Future<HootUser> signIn(
+    String email,
+    String password,
+  ) async {
     try {
       UserCredential credential = await auth.signInWithEmailAndPassword(
         email: email,
@@ -33,5 +36,17 @@ class AuthService {
       }
     }
     return null;
+  }
+
+  Future<HootUser> signUp(
+    String email,
+    String username,
+    String password,
+  ) async {
+    UserCredential credential = await auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return _toHootUser(credential.user);
   }
 }

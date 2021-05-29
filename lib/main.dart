@@ -6,6 +6,7 @@ import 'package:hoot/assets/styles.dart';
 import 'package:hoot/pages/home.dart';
 import 'package:hoot/pages/loading.dart';
 import 'package:hoot/pages/login.dart';
+import 'package:hoot/pages/register.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => LoadingPage(),
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
+        '/register' :(context) => RegisterPage(),
       },
       theme: ThemeData(
         brightness: Brightness.dark,

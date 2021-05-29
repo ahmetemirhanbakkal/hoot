@@ -44,7 +44,9 @@ class _HomePageState extends State<HomePage> {
           ),
           IconButton(
             icon: Icon(Icons.logout),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/login');
+            },
             tooltip: 'Logout',
           ),
           /*
