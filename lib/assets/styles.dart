@@ -20,3 +20,20 @@ final ButtonStyle textButtonStyle = ButtonStyle(
     ),
   ),
 );
+
+SnackBar buildErrorSnackBar(String message, BuildContext context) {
+  return SnackBar(
+    backgroundColor: errorColor,
+    content: Text(
+      message,
+      style: TextStyle(color: foregroundColor),
+    ),
+    action: SnackBarAction(
+      textColor: foregroundColor,
+      label: 'Dismiss',
+      onPressed: () {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      },
+    ),
+  );
+}

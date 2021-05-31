@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class HootUser {
-  final String uid;
-  final String username;
+  final String id;
   final String email;
+  String username;
 
-  HootUser({@required this.uid, this.username, this.email});
+  HootUser({@required this.id, this.email});
 }

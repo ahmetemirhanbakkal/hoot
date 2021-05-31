@@ -5,6 +5,7 @@ import 'package:hoot/assets/constants.dart';
 import 'package:hoot/assets/styles.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/services/auth.dart';
+import 'package:hoot/services/firestore.dart';
 import 'package:hoot/views/loading_dialog.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final AuthService _auth = AuthService.getInstance();
+  final FirestoreService _firestore = FirestoreService.getInstance();
   final _formKey = GlobalKey<FormState>();
   bool _checked = false;
 
@@ -23,16 +25,19 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemNavigationBarColor: primaryColor,
-    ));
-
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(32),
-            child: buildForm(),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light
+          .copyWith(systemNavigationBarColor: primaryColor),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: primaryColor,
+        ),
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(32),
+              child: buildForm(),
+            ),
           ),
         ),
       ),
@@ -51,7 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Sıgn Up',
+              'Register',
               style: Theme.of(context).textTheme.headline4,
             ),
           ),
@@ -90,7 +95,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           SizedBox(height: 32),
           TextFormField(
-            validator: (val) => val.length<6
+            validator: (val) => val.length < 6
                 ? 'Your password eat least must be 6 character.'
                 : null,
             decoration: InputDecoration(
@@ -105,6 +110,7 @@ class _RegisterPageState extends State<RegisterPage> {
             textInputAction: TextInputAction.done,
             onEditingComplete: () => focus.unfocus(),
             onFieldSubmitted: (value) async => _onSignUpPressed(),
+            obscureText: true,
           ),
           SizedBox(height: 32),
           TextButton(
@@ -126,28 +132,27 @@ class _RegisterPageState extends State<RegisterPage> {
         context: context,
         builder: (context) => LoadingDialog(),
       );
-      HootUser user = await _auth.signUp(_email, _username, _password);
-      Navigator.pop(context);
-      if (user == null) {
-        final snackBar = SnackBar(
-          backgroundColor: errorColor,
-          content: Text(
-            'Error',
-            style: TextStyle(color: foregroundColor),
-          ),
-          action: SnackBarAction(
-            textColor: foregroundColor,
-            label: 'Dismiss',
-            onPressed: () {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            },
-          ),
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      dynamic result = await _auth.signUp(_email, _password);
+      if (result is HootUser) {
+        String firestoreError =
+            await _firestore.createUser(result.id, _username);
+        Navigator.pop(context);
+        if (firestoreError == null) {
+          result.username = _username;
+          Map args = {'user': result};
+          Navigator.pushReplacementNamed(
+            context,
+            '/home',
+            arguments: args,
+          );
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(buildErrorSnackBar(firestoreError, context));
+        }
       } else {
-        Map arguments = {'user': user};
-        Navigator.pushReplacementNamed(context, '/login', arguments: arguments);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(buildErrorSnackBar(result, context));
       }
     }
   }

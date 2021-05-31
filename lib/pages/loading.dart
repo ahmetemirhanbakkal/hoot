@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:hoot/assets/colors.dart';
+import 'package:hoot/models/hoot_user.dart';
+import 'package:hoot/services/auth.dart';
 
 class LoadingPage extends StatefulWidget {
   @override
@@ -8,6 +11,8 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
+  final AuthService _auth = AuthService.getInstance();
+
   @override
   void initState() {
     super.initState();
@@ -16,19 +21,30 @@ class _LoadingPageState extends State<LoadingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: SpinKitCubeGrid(
-          color: secondaryColor,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light
+          .copyWith(systemNavigationBarColor: primaryColor),
+      child: Scaffold(
+        body: Center(
+          child: SpinKitCubeGrid(
+            color: secondaryColor,
+          ),
         ),
       ),
     );
   }
 
   void redirect() {
-    // TODO: Authenticate user
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      Navigator.pushReplacementNamed(context, '/login');
-    });
+    HootUser user = _auth.getUser();
+    if (user == null) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        Navigator.pushReplacementNamed(context, '/login');
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        Map args = {'user': user};
+        Navigator.pushReplacementNamed(context, '/home', arguments: args);
+      });
+    }
   }
 }

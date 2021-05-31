@@ -22,16 +22,16 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemNavigationBarColor: primaryColor,
-    ));
-
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(32),
-            child: buildForm(),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light
+          .copyWith(systemNavigationBarColor: primaryColor),
+      child: Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(32),
+              child: buildForm(),
+            ),
           ),
         ),
       ),
@@ -106,9 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/register');
-            },
+            onPressed: () => Navigator.pushNamed(context, '/register'),
           ),
         ],
       ),
@@ -123,28 +121,14 @@ class _LoginPageState extends State<LoginPage> {
         context: context,
         builder: (context) => LoadingDialog(),
       );
-      HootUser user = await _auth.signIn(_email, _password);
+      dynamic result = await _auth.signIn(_email, _password);
       Navigator.pop(context);
-      if (user == null) {
-        final snackBar = SnackBar(
-          backgroundColor: errorColor,
-          content: Text(
-            'Error',
-            style: TextStyle(color: foregroundColor),
-          ),
-          action: SnackBarAction(
-            textColor: foregroundColor,
-            label: 'Dismiss',
-            onPressed: () {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            },
-          ),
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      if (result is HootUser) {
+        Map args = {'user': result};
+        Navigator.pushReplacementNamed(context, '/home', arguments: args);
       } else {
-        Map arguments = {'user': user};
-        Navigator.pushReplacementNamed(context, '/home', arguments: arguments);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(buildErrorSnackBar(result, context));
       }
     }
   }

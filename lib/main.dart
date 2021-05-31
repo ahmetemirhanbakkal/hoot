@@ -14,17 +14,30 @@ void main() async {
   runApp(MyApp());
 }
 
+class BouncingScrollBehavior extends ScrollBehavior {
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return BouncingScrollPhysics();
+  }
+}
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: BouncingScrollBehavior(),
+          child: child,
+        );
+      },
       debugShowCheckedModeBanner: false,
       title: 'Hoot',
       routes: {
         '/': (context) => LoadingPage(),
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
-        '/register' :(context) => RegisterPage(),
+        '/register': (context) => RegisterPage(),
       },
       theme: ThemeData(
         brightness: Brightness.dark,

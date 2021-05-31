@@ -12,10 +12,10 @@ class AuthService {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   HootUser _toHootUser(User user) {
-    return user == null ? null : HootUser(uid: user.uid, email: user.email);
+    return user == null ? null : HootUser(id: user.uid, email: user.email);
   }
 
-  Future<HootUser> signIn(
+  Future signIn(
     String email,
     String password,
   ) async {
@@ -26,21 +26,12 @@ class AuthService {
       );
       return _toHootUser(credential.user);
     } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'user-not-found':
-          print('No user found for that email.');
-          break;
-        case 'wrong-password':
-          print('Wrong password provided for that user.');
-          break;
-      }
+      return e.message;
     }
-    return null;
   }
 
-  Future<HootUser> signUp(
+  Future signUp(
     String email,
-    String username,
     String password,
   ) async {
     try {
@@ -50,12 +41,21 @@ class AuthService {
       );
       return _toHootUser(credential.user);
     } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'email-already-in-use':
-          print('This e-mail is used.');
-          break;
-      }
+      return e.message;
     }
-    return null;
+  }
+
+  Future signOut() async {
+    try {
+      await auth.signOut();
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return e.message;
+    }
+  }
+
+  HootUser getUser() {
+    User user = auth.currentUser;
+    return user == null ? null : _toHootUser(user);
   }
 }
