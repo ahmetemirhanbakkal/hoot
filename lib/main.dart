@@ -7,6 +7,7 @@ import 'package:hoot/pages/home.dart';
 import 'package:hoot/pages/loading.dart';
 import 'package:hoot/pages/login.dart';
 import 'package:hoot/pages/register.dart';
+import 'package:hoot/pages/search.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
         '/register': (context) => RegisterPage(),
+        '/search': (context) => SearchPage(),
       },
       theme: ThemeData(
         brightness: Brightness.dark,

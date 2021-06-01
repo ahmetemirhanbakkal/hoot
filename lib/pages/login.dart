@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
               suffixIcon: IconButton(
                 icon: Icon(
                   _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                  color: Theme.of(context).primaryColorDark,
+                  color: secondaryColor,
                 ),
                 onPressed: () {
                   setState(() {
@@ -127,6 +127,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _onSignInPressed() async {
     _checked = true;
+    _email = _email.trim();
     FocusScope.of(context).unfocus();
     if (_formKey.currentState.validate()) {
       showDialog(

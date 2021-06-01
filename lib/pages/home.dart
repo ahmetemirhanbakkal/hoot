@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
           actions: [
             IconButton(
               icon: Icon(Icons.search),
-              onPressed: () {},
+              onPressed: () => Navigator.pushNamed(context, '/search'),
               tooltip: 'Search',
             ),
             IconButton(

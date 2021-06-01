@@ -5,5 +5,5 @@ class HootUser {
   final String email;
   String username;
 
-  HootUser({@required this.id, this.email});
+  HootUser({@required this.id, this.username, this.email});
 }

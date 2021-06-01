@@ -93,6 +93,9 @@ class _RegisterPageState extends State<RegisterPage> {
             },
             textInputAction: TextInputAction.next,
             onEditingComplete: () => focus.nextFocus(),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp('[a-z0-9]')),
+            ],
           ),
           SizedBox(height: 32),
           TextFormField(
@@ -107,7 +110,7 @@ class _RegisterPageState extends State<RegisterPage> {
               suffixIcon: IconButton(
                 icon: Icon(
                   _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                  color: Theme.of(context).primaryColorDark,
+                  color: secondaryColor,
                 ),
                 onPressed: () {
                   setState(() {
@@ -137,6 +140,8 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _onSignUpPressed() async {
+    _email = _email.trim();
+    _username = _username.trim();
     _checked = true;
     FocusScope.of(context).unfocus();
     if (_formKey.currentState.validate()) {
