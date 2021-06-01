@@ -16,6 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final AuthService _auth = AuthService.getInstance();
   final _formKey = GlobalKey<FormState>();
   bool _checked = false;
+  bool _passwordVisible = false;
 
   String _email = '';
   String _password = '';
@@ -73,10 +74,22 @@ class _LoginPageState extends State<LoginPage> {
           SizedBox(height: 32),
           TextFormField(
             validator: (val) => val.isEmpty ? 'Enter your password.' : null,
+            obscureText: !_passwordVisible,
             decoration: InputDecoration(
               hintText: 'Password',
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.all(largePadding),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                  color: Theme.of(context).primaryColorDark,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _passwordVisible = !_passwordVisible;
+                  });
+                },
+              ),
             ),
             onChanged: (val) {
               _password = val;
@@ -85,7 +98,6 @@ class _LoginPageState extends State<LoginPage> {
             textInputAction: TextInputAction.done,
             onEditingComplete: () => focus.unfocus(),
             onFieldSubmitted: (value) async => _onSignInPressed(),
-            obscureText: true,
           ),
           SizedBox(height: 32),
           TextButton(

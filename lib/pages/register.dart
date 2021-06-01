@@ -18,6 +18,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final FirestoreService _firestore = FirestoreService.getInstance();
   final _formKey = GlobalKey<FormState>();
   bool _checked = false;
+  bool _passwordVisible = false;
 
   String _email = '';
   String _username = '';
@@ -95,6 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           SizedBox(height: 32),
           TextFormField(
+            obscureText: !_passwordVisible,
             validator: (val) => val.length < 6
                 ? 'Your password eat least must be 6 character.'
                 : null,
@@ -102,6 +104,17 @@ class _RegisterPageState extends State<RegisterPage> {
               hintText: 'Password',
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.all(largePadding),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                  color: Theme.of(context).primaryColorDark,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _passwordVisible = !_passwordVisible;
+                  });
+                },
+              ),
             ),
             onChanged: (val) {
               _password = val;
@@ -110,7 +123,6 @@ class _RegisterPageState extends State<RegisterPage> {
             textInputAction: TextInputAction.done,
             onEditingComplete: () => focus.unfocus(),
             onFieldSubmitted: (value) async => _onSignUpPressed(),
-            obscureText: true,
           ),
           SizedBox(height: 32),
           TextButton(
