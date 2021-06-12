@@ -7,9 +7,9 @@ class LoadingDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => false,
-      child: AlertDialog(
-        backgroundColor: Colors.transparent,
-        content: SpinKitCubeGrid(
+      child: Container(
+        color: Colors.black.withOpacity(0.5),
+        child: SpinKitCubeGrid(
           color: secondaryColor,
         ),
       ),

@@ -156,6 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
         Navigator.pop(context);
         if (firestoreError == null) {
           result.username = _username;
+          result.friendIds = [];
           Map args = {'user': result};
           Navigator.pushReplacementNamed(
             context,

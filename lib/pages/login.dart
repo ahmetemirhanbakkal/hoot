@@ -48,11 +48,10 @@ class _LoginPageState extends State<LoginPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Login',
-              style: Theme.of(context).textTheme.headline4,
+          Center(
+            child: Image(
+              image: AssetImage('assets/images/logo_trans.png'),
+              width: 200,
             ),
           ),
           SizedBox(height: 32),

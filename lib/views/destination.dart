@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hoot/assets/globals.dart';
+import 'package:hoot/models/hoot_user.dart';
+import 'package:hoot/pages/friends.dart';
 
 class Destination {
   static const String chats = 'Chats';
   static const String friends = 'Friends';
   static const String profile = 'Profile';
 
-  const Destination({this.title, this.iconData});
+  const Destination({this.title, this.iconData, this.loggedUser});
   final String title;
   final IconData iconData;
+  final HootUser loggedUser;
 }
 
 class DestinationView extends StatefulWidget {
@@ -48,7 +51,8 @@ class _DestinationViewState extends State<DestinationView> {
 
   Widget buildChatsPage() {
     switch (widget.destination.title) {
-      case Destination.chats:
+      case Destination.friends:
+        return FriendsPage(loggedUser: widget.destination.loggedUser);
       default:
         return Center(child: Text(widget.destination.title));
     }

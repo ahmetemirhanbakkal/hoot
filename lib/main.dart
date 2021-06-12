@@ -46,6 +46,7 @@ class MyApp extends StatelessWidget {
         primaryColor: primaryColor,
         accentColor: secondaryColor,
         splashColor: splashColor,
+        focusColor: secondaryColor,
         scaffoldBackgroundColor: primaryColor,
         canvasColor: primaryColorDark,
         errorColor: errorColor,

@@ -5,6 +5,7 @@ import 'package:hoot/assets/constants.dart';
 import 'package:hoot/assets/styles.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/services/auth.dart';
+import 'package:hoot/services/firestore.dart';
 import 'package:hoot/views/destination.dart';
 import 'package:hoot/views/loading_dialog.dart';
 
@@ -15,19 +16,32 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AuthService _auth = AuthService.getInstance();
-  HootUser _user;
+  final FirestoreService _firestore = FirestoreService.getInstance();
+  HootUser _loggedUser;
   int _navigationIndex = 0;
-
-  final List<Destination> destinations = [
-    Destination(title: Destination.chats, iconData: Icons.chat),
-    Destination(title: Destination.friends, iconData: Icons.people),
-    Destination(title: Destination.profile, iconData: Icons.person),
-  ];
 
   @override
   Widget build(BuildContext context) {
     final Map args = ModalRoute.of(context).settings.arguments;
-    _user = args['user'];
+    _loggedUser = args['user'];
+
+    final List<Destination> destinations = [
+      Destination(
+        title: Destination.chats,
+        iconData: Icons.chat,
+        loggedUser: _loggedUser,
+      ),
+      Destination(
+        title: Destination.friends,
+        iconData: Icons.people,
+        loggedUser: _loggedUser,
+      ),
+      Destination(
+        title: Destination.profile,
+        iconData: Icons.person,
+        loggedUser: _loggedUser,
+      ),
+    ];
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light
@@ -38,7 +52,10 @@ class _HomePageState extends State<HomePage> {
           actions: [
             IconButton(
               icon: Icon(Icons.search),
-              onPressed: () => Navigator.pushNamed(context, '/search'),
+              onPressed: () {
+                Map args = {'user': _loggedUser};
+                Navigator.pushNamed(context, '/search', arguments: args);
+              },
               tooltip: 'Search',
             ),
             IconButton(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hoot/assets/colors.dart';
-import 'package:hoot/assets/constants.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/services/firestore.dart';
+import 'package:hoot/views/user_list.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -15,15 +15,14 @@ class _SearchPageState extends State<SearchPage> {
   TextEditingController _searchQueryController = TextEditingController();
   bool _isSearching = false;
   String _searchQuery = '';
+  HootUser _loggedUser;
   List<HootUser> _users = [];
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final Map args = ModalRoute.of(context).settings.arguments;
+    _loggedUser = args['user'];
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light
           .copyWith(systemNavigationBarColor: primaryColor),
@@ -39,61 +38,19 @@ class _SearchPageState extends State<SearchPage> {
           title: _buildSearchField(),
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(4),
-            child: _isSearching ? LinearProgressIndicator() : Container(),
+            child: _isSearching
+                ? LinearProgressIndicator(
+                    color: secondaryColor,
+                    backgroundColor: Colors.transparent,
+                  )
+                : Container(),
           ),
         ),
-        body: _buildListView(),
-      ),
-    );
-  }
-
-  Widget _buildListView() {
-    return Padding(
-      padding: EdgeInsets.all(4),
-      child: ListView.separated(
-        itemBuilder: (context, index) => _buildListItem(context, index),
-        separatorBuilder: (context, index) => SizedBox(height: 4),
-        itemCount: _users.length,
-      ),
-    );
-  }
-
-  Widget _buildListItem(BuildContext context, int index) {
-    HootUser user = _users[index];
-    RoundedRectangleBorder roundedRectangleBorder = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(largeRadius),
-    );
-    return Card(
-      shape: roundedRectangleBorder,
-      child: InkWell(
-        customBorder: roundedRectangleBorder,
-        onTap: () {},
-        child: Padding(
-          padding: EdgeInsets.all(smallPadding),
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: smallPadding),
-                  child: Text(
-                    user.username,
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.person_add,
-                  color: secondaryColor,
-                ),
-                onPressed: () {},
-                tooltip: 'Add friend',
-              ),
-            ],
-          ),
+        body: UserListView(
+          loggedUser: _loggedUser,
+          users: _users,
         ),
       ),
-      color: primaryColorLight,
     );
   }
 
@@ -113,8 +70,10 @@ class _SearchPageState extends State<SearchPage> {
 
   void _startSearch() async {
     setState(() => _isSearching = true);
-    dynamic result =
-        await _firestore.searchUsers(_searchQuery.trim().toLowerCase());
+    dynamic result = await _firestore.searchUsers(
+      _searchQuery.trim().toLowerCase(),
+      _loggedUser.id,
+    );
     if (result is List<HootUser>) {
       _users = result;
     }

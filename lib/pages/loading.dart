@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:hoot/assets/colors.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/services/auth.dart';
+import 'package:hoot/services/firestore.dart';
 
 class LoadingPage extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class LoadingPage extends StatefulWidget {
 
 class _LoadingPageState extends State<LoadingPage> {
   final AuthService _auth = AuthService.getInstance();
+  final FirestoreService _firestore = FirestoreService.getInstance();
 
   @override
   void initState() {
@@ -34,17 +36,24 @@ class _LoadingPageState extends State<LoadingPage> {
     );
   }
 
-  void redirect() {
+  void redirect() async {
     HootUser user = _auth.getUser();
     if (user == null) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         Navigator.pushReplacementNamed(context, '/login');
       });
     } else {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        Map args = {'user': user};
-        Navigator.pushReplacementNamed(context, '/home', arguments: args);
-      });
+      dynamic result = await _firestore.getUserDetails(user);
+      if (result == null) {
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          Map args = {'user': user};
+          Navigator.pushReplacementNamed(context, '/home', arguments: args);
+        });
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          Navigator.pushReplacementNamed(context, '/login');
+        });
+      }
     }
   }
 }
