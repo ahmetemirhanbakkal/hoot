@@ -6,7 +6,6 @@ import 'package:hoot/assets/globals.dart';
 import 'package:hoot/assets/styles.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/services/auth.dart';
-import 'package:hoot/services/firestore.dart';
 import 'package:hoot/views/destination.dart';
 import 'package:hoot/views/loading_dialog.dart';
 
@@ -17,7 +16,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AuthService _auth = AuthService.getInstance();
-  final FirestoreService _firestore = FirestoreService.getInstance();
   HootUser _loggedUser;
   int _navigationIndex = 0;
 
@@ -50,7 +48,12 @@ class _HomePageState extends State<HomePage> {
           .copyWith(systemNavigationBarColor: primaryColorDark),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Hoot'),
+          title: Container(
+            child: Image(
+              image: AssetImage('assets/images/logo_trans.png'),
+              height: 36,
+            ),
+          ),
           actions: [
             IconButton(
               icon: Icon(Icons.search),
@@ -121,12 +124,12 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) => LoadingDialog(),
     );
-    String errorMsg = await _auth.signOut();
+    String authError = await _auth.signOut();
     Navigator.pop(context);
-    if (errorMsg == null) {
+    if (authError == null) {
       Navigator.pushReplacementNamed(context, '/login');
     } else {
-      buildErrorSnackBar(errorMsg, context);
+      buildErrorSnackBar(authError, context);
     }
   }
 }

@@ -151,8 +151,11 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       dynamic result = await _auth.signUp(_email, _password);
       if (result is HootUser) {
-        String firestoreError =
-            await _firestore.createUser(result.id, _username);
+        String firestoreError = await _firestore.createUser(
+          result.id,
+          _username,
+          result.email,
+        );
         Navigator.pop(context);
         if (firestoreError == null) {
           result.username = _username;

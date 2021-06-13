@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hoot/assets/globals.dart';
 import 'package:hoot/models/hoot_user.dart';
+import 'package:hoot/pages/chats.dart';
 import 'package:hoot/pages/friends.dart';
 
 class Destination {
@@ -51,6 +52,8 @@ class _DestinationViewState extends State<DestinationView> {
 
   Widget buildChatsPage() {
     switch (widget.destination.title) {
+      case Destination.chats:
+        return ChatsPage(loggedUser: widget.destination.loggedUser);
       case Destination.friends:
         return FriendsPage(loggedUser: widget.destination.loggedUser);
       default:

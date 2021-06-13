@@ -23,36 +23,39 @@ class _UserCardViewState extends State<UserCardView> {
   @override
   Widget build(BuildContext context) {
     _alreadyFriend = widget.loggedUser.friendIds.contains(widget.user.id);
-    RoundedRectangleBorder roundedRectangleBorder = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(largeRadius),
-    );
-    return Card(
-      shape: roundedRectangleBorder,
-      child: Container(
-        height: 64,
-        child: InkWell(
-          customBorder: roundedRectangleBorder,
-          onTap: () {
-            Map args = {
-              'logged_user': widget.loggedUser,
-              'target_user': widget.user,
-            };
-            Navigator.pushNamed(homeContext, '/chat', arguments: args);
-          },
-          child: Padding(
-            padding: EdgeInsets.all(smallPadding),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: smallPadding),
-                    child: Text(
-                      widget.user.username,
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
+    return Container(
+      child: InkWell(
+        onTap: () {
+          Map args = {
+            'logged_user': widget.loggedUser,
+            'target_user': widget.user,
+          };
+          Navigator.pushNamed(homeContext, '/chat', arguments: args);
+        },
+        child: Padding(
+          padding: EdgeInsets.all(smallPadding),
+          child: Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: smallPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.user.username,
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                      SizedBox(height: 4),
+                      Text(widget.user.email),
+                    ],
                   ),
                 ),
-                AnimatedSwitcher(
+              ),
+              Container(
+                height: 56,
+                width: 56,
+                child: AnimatedSwitcher(
                   duration: Duration(milliseconds: fastAnimDuration),
                   child: _loading
                       ? CircularProgressIndicator()
@@ -64,15 +67,15 @@ class _UserCardViewState extends State<UserCardView> {
                             color: secondaryColor,
                           ),
                           onPressed: () => _addOrRemoveFriend(),
-                          tooltip: 'Add friend',
+                          tooltip:
+                              _alreadyFriend ? 'Remove friend' : 'Add friend',
                         ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
-      color: primaryColorLight,
     );
   }
 

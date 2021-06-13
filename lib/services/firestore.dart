@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hoot/models/chat.dart';
 import 'package:hoot/models/hoot_user.dart';
 
 class FirestoreService {
@@ -11,11 +14,12 @@ class FirestoreService {
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  Future<String> createUser(String id, String username) async {
+  Future<String> createUser(String id, String username, String email) async {
     CollectionReference users = firestore.collection('users');
     try {
       await users.doc(id).set({
         'username': username,
+        'email': email,
         'friendIds': [],
       });
       return null;
@@ -50,6 +54,7 @@ class FirestoreService {
         users.add(HootUser(
           id: document.id,
           username: document.get('username'),
+          email: document.get('email'),
           friendIds: document.get('friendIds').cast<String>(),
         ));
       }
@@ -60,11 +65,14 @@ class FirestoreService {
   }
 
   Future addOrRemoveFriend(
-      String userId, String friendId, bool alreadyFriend) async {
+    String userId,
+    String friendId,
+    bool alreadyFriend,
+  ) async {
     CollectionReference users = firestore.collection('users');
     try {
       await users.doc(userId).update({
-        'friends': alreadyFriend
+        'friendIds': alreadyFriend
             ? FieldValue.arrayRemove([friendId])
             : FieldValue.arrayUnion([friendId]),
       });
@@ -87,6 +95,7 @@ class FirestoreService {
         users.add(HootUser(
           id: document.id,
           username: document.get('username'),
+          email: document.get('email'),
           friendIds: document.get('friendIds').cast<String>(),
         ));
       }
@@ -96,5 +105,38 @@ class FirestoreService {
     }
   }
 
-  Future getChat() async {}
+  Future createChat(Chat chat) async {
+    CollectionReference chats = firestore.collection('chats');
+    try {
+      await chats.add({
+        'userIds': chat.userIds,
+        'usernames': chat.usernames,
+        'lastMessage': chat.lastMessage,
+        'lastMessageDate': chat.lastMessageDate,
+      });
+      return null;
+    } on FirebaseException catch (e) {
+      return e.message;
+    }
+  }
+
+  Stream<List<Chat>> getChatsStream(String userId) {
+    CollectionReference chats = firestore.collection('chats');
+    return chats
+        .where('userIds', arrayContains: userId)
+        .snapshots()
+        .map((event) {
+      List<Chat> chats = [];
+      for (QueryDocumentSnapshot document in event.docs) {
+        Timestamp lastMessageTimestamp = document.get('lastMessageDate');
+        chats.add(Chat(
+          userIds: document.get('userIds').cast<String>(),
+          usernames: document.get('usernames').cast<String>(),
+          lastMessage: document.get('lastMessage'),
+          lastMessageDate: lastMessageTimestamp.toDate(),
+        ));
+      }
+      return chats;
+    });
+  }
 }

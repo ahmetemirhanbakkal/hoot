@@ -15,16 +15,13 @@ class UserListView extends StatefulWidget {
 class _UserListViewState extends State<UserListView> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(4),
-      child: ListView.separated(
-        itemBuilder: (context, index) {
-          HootUser user = widget.users[index];
-          return UserCardView(loggedUser: widget.loggedUser, user: user);
-        },
-        separatorBuilder: (context, index) => SizedBox(height: 4),
-        itemCount: widget.users.length,
-      ),
+    return ListView.separated(
+      itemBuilder: (context, index) {
+        HootUser user = widget.users[index];
+        return UserCardView(loggedUser: widget.loggedUser, user: user);
+      },
+      separatorBuilder: (context, index) => SizedBox(height: 4),
+      itemCount: widget.users.length,
     );
   }
 }
