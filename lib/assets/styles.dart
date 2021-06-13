@@ -21,8 +21,8 @@ final ButtonStyle textButtonStyle = ButtonStyle(
   ),
 );
 
-SnackBar buildErrorSnackBar(String message, BuildContext context) {
-  return SnackBar(
+void buildErrorSnackBar(String message, BuildContext context) {
+  SnackBar snackBar = SnackBar(
     backgroundColor: errorColor,
     content: Text(
       message,
@@ -36,4 +36,5 @@ SnackBar buildErrorSnackBar(String message, BuildContext context) {
       },
     ),
   );
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hoot/assets/colors.dart';
 import 'package:hoot/assets/styles.dart';
+import 'package:hoot/pages/chat.dart';
 import 'package:hoot/pages/home.dart';
 import 'package:hoot/pages/loading.dart';
 import 'package:hoot/pages/login.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => HomePage(),
         '/register': (context) => RegisterPage(),
         '/search': (context) => SearchPage(),
+        '/chat': (context) => ChatPage(),
       },
       theme: ThemeData(
         brightness: Brightness.dark,

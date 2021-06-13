@@ -164,13 +164,11 @@ class _RegisterPageState extends State<RegisterPage> {
             arguments: args,
           );
         } else {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(buildErrorSnackBar(firestoreError, context));
+          buildErrorSnackBar(firestoreError, context);
         }
       } else {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(buildErrorSnackBar(result, context));
+        buildErrorSnackBar(result, context);
       }
     }
   }

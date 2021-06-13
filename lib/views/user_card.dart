@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hoot/assets/colors.dart';
 import 'package:hoot/assets/constants.dart';
+import 'package:hoot/assets/globals.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/services/firestore.dart';
 
@@ -31,7 +32,13 @@ class _UserCardViewState extends State<UserCardView> {
         height: 64,
         child: InkWell(
           customBorder: roundedRectangleBorder,
-          onTap: () {},
+          onTap: () {
+            Map args = {
+              'logged_user': widget.loggedUser,
+              'target_user': widget.user,
+            };
+            Navigator.pushNamed(homeContext, '/chat', arguments: args);
+          },
           child: Padding(
             padding: EdgeInsets.all(smallPadding),
             child: Row(
@@ -77,9 +84,17 @@ class _UserCardViewState extends State<UserCardView> {
       _alreadyFriend,
     );
     if (error == null) {
-      _alreadyFriend
-          ? widget.loggedUser.friendIds.remove(widget.user.id)
-          : widget.loggedUser.friendIds.add(widget.user.id);
+      if (_alreadyFriend) {
+        widget.loggedUser.friendIds.remove(widget.user.id);
+      } else {
+        widget.loggedUser.friendIds.add(widget.user.id);
+        if ((widget.loggedUser.friends.singleWhere(
+                (item) => item.id == widget.user.id,
+                orElse: () => null)) ==
+            null) {
+          widget.loggedUser.friends.add(widget.user);
+        }
+      }
       _alreadyFriend = !_alreadyFriend;
     }
     setState(() => _loading = false);

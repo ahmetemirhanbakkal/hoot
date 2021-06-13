@@ -16,7 +16,7 @@ class FirestoreService {
     try {
       await users.doc(id).set({
         'username': username,
-        'friends': [],
+        'friendIds': [],
       });
       return null;
     } on FirebaseException catch (e) {
@@ -29,7 +29,7 @@ class FirestoreService {
     try {
       DocumentSnapshot document = await users.doc(user.id).get();
       user.username = document.get('username');
-      user.friendIds = document.get('friends').cast<String>();
+      user.friendIds = document.get('friendIds').cast<String>();
       return null;
     } on FirebaseException catch (e) {
       return e.message;
@@ -50,7 +50,7 @@ class FirestoreService {
         users.add(HootUser(
           id: document.id,
           username: document.get('username'),
-          friendIds: document.get('friends').cast<String>(),
+          friendIds: document.get('friendIds').cast<String>(),
         ));
       }
       return users;
@@ -76,6 +76,8 @@ class FirestoreService {
 
   Future getFriends(HootUser loggedUser) async {
     List<HootUser> users = [];
+    loggedUser.friends = users;
+    if (loggedUser.friendIds.isEmpty) return null;
     CollectionReference usersCollection = firestore.collection('users');
     try {
       QuerySnapshot querySnapshot = await usersCollection
@@ -85,13 +87,14 @@ class FirestoreService {
         users.add(HootUser(
           id: document.id,
           username: document.get('username'),
-          friendIds: document.get('friends').cast<String>(),
+          friendIds: document.get('friendIds').cast<String>(),
         ));
       }
-      loggedUser.friends = users;
       return null;
     } on FirebaseException catch (e) {
       return e.message;
     }
   }
+
+  Future getChat() async {}
 }

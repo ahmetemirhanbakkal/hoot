@@ -5,6 +5,7 @@ import 'package:hoot/assets/constants.dart';
 import 'package:hoot/assets/styles.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/services/auth.dart';
+import 'package:hoot/services/firestore.dart';
 import 'package:hoot/views/loading_dialog.dart';
 
 class LoginPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final AuthService _auth = AuthService.getInstance();
+  final FirestoreService _firestore = FirestoreService.getInstance();
   final _formKey = GlobalKey<FormState>();
   bool _checked = false;
   bool _passwordVisible = false;
@@ -133,14 +135,18 @@ class _LoginPageState extends State<LoginPage> {
         context: context,
         builder: (context) => LoadingDialog(),
       );
-      dynamic result = await _auth.signIn(_email, _password);
+      dynamic authResult = await _auth.signIn(_email, _password);
       Navigator.pop(context);
-      if (result is HootUser) {
-        Map args = {'user': result};
-        Navigator.pushReplacementNamed(context, '/home', arguments: args);
+      if (authResult is HootUser) {
+        dynamic firestoreResult = await _firestore.getUserDetails(authResult);
+        if (firestoreResult == null) {
+          Map args = {'user': authResult};
+          Navigator.pushReplacementNamed(context, '/home', arguments: args);
+        } else {
+          buildErrorSnackBar(firestoreResult, context);
+        }
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(buildErrorSnackBar(result, context));
+        buildErrorSnackBar(authResult, context);
       }
     }
   }

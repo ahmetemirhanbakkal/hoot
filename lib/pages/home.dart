@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hoot/assets/colors.dart';
 import 'package:hoot/assets/constants.dart';
+import 'package:hoot/assets/globals.dart';
 import 'package:hoot/assets/styles.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/services/auth.dart';
@@ -22,6 +23,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    homeContext = context;
     final Map args = ModalRoute.of(context).settings.arguments;
     _loggedUser = args['user'];
 
@@ -124,8 +126,7 @@ class _HomePageState extends State<HomePage> {
     if (errorMsg == null) {
       Navigator.pushReplacementNamed(context, '/login');
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(buildErrorSnackBar(errorMsg, context));
+      buildErrorSnackBar(errorMsg, context);
     }
   }
 }

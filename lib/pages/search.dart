@@ -38,12 +38,7 @@ class _SearchPageState extends State<SearchPage> {
           title: _buildSearchField(),
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(4),
-            child: _isSearching
-                ? LinearProgressIndicator(
-                    color: secondaryColor,
-                    backgroundColor: Colors.transparent,
-                  )
-                : Container(),
+            child: _isSearching ? LinearProgressIndicator() : Container(),
           ),
         ),
         body: UserListView(
