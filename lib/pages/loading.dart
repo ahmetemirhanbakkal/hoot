@@ -5,6 +5,7 @@ import 'package:hoot/assets/colors.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/services/auth.dart';
 import 'package:hoot/services/firestore.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class LoadingPage extends StatefulWidget {
   @override
@@ -37,6 +38,7 @@ class _LoadingPageState extends State<LoadingPage> {
   }
 
   void redirect() async {
+    initializeDateFormatting();
     HootUser user = _auth.getUser();
     if (user == null) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {

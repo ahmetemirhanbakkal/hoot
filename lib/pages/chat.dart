@@ -37,11 +37,31 @@ class _ChatPageState extends State<ChatPage> {
       ),
       body: Column(
         children: [
-          Expanded(child: Container()),
+          Expanded(child: buildMessages()),
           buildMessageBar(),
         ],
       ),
     );
+  }
+
+  Widget buildMessages() {
+    /*
+    return StreamBuilder(
+      stream: _firestore.getMessagesStream(widget.loggedUser.id),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) _chats = snapshot.data;
+        return ListView.builder(
+          itemBuilder: (context, index) {
+            return ChatCardView(
+              loggedUser: widget.loggedUser,
+              chat: _chats[index],
+            );
+          },
+          itemCount: _chats.length,
+        );
+      },
+    );
+    */
   }
 
   Widget buildMessageBar() {

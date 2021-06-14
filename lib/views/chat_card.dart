@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hoot/assets/colors.dart';
 import 'package:hoot/assets/constants.dart';
 import 'package:hoot/assets/globals.dart';
 import 'package:hoot/models/chat.dart';
 import 'package:hoot/models/hoot_user.dart';
+import 'package:intl/intl.dart';
 
 class ChatCardView extends StatefulWidget {
   final HootUser loggedUser;
@@ -36,28 +38,46 @@ class _ChatCardViewState extends State<ChatCardView> {
           };
           Navigator.pushNamed(homeContext, '/chat', arguments: args);
         },
-        child: Padding(
-          padding: EdgeInsets.all(smallPadding),
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: smallPadding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _chatName,
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                      SizedBox(height: 4),
-                      Text(widget.chat.lastMessage),
-                    ],
-                  ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(largePadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _chatName,
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
+                    SizedBox(height: 4),
+                    Text(widget.chat.lastMessage),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(largePadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    DateFormat.MMMMd('en').format(widget.chat.lastMessageDate),
+                    style: TextStyle(color: secondaryColor),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    DateFormat.Hm('en').format(widget.chat.lastMessageDate),
+                    style: TextStyle(
+                      color: secondaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

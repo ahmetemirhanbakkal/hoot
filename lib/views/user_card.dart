@@ -32,48 +32,46 @@ class _UserCardViewState extends State<UserCardView> {
           };
           Navigator.pushNamed(homeContext, '/chat', arguments: args);
         },
-        child: Padding(
-          padding: EdgeInsets.all(smallPadding),
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: smallPadding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.user.username,
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                      SizedBox(height: 4),
-                      Text(widget.user.email),
-                    ],
-                  ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(largePadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.user.username,
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
+                    SizedBox(height: 4),
+                    Text(widget.user.email),
+                  ],
                 ),
               ),
-              Container(
-                height: 56,
-                width: 56,
-                child: AnimatedSwitcher(
-                  duration: Duration(milliseconds: fastAnimDuration),
-                  child: _loading
-                      ? CircularProgressIndicator()
-                      : IconButton(
-                          icon: Icon(
-                            _alreadyFriend
-                                ? Icons.person_remove
-                                : Icons.person_add,
-                            color: secondaryColor,
-                          ),
-                          onPressed: () => _addOrRemoveFriend(),
-                          tooltip:
-                              _alreadyFriend ? 'Remove friend' : 'Add friend',
+            ),
+            Container(
+              height: 56,
+              width: 56,
+              child: AnimatedSwitcher(
+                duration: Duration(milliseconds: fastAnimDuration),
+                child: _loading
+                    ? CircularProgressIndicator()
+                    : IconButton(
+                        icon: Icon(
+                          _alreadyFriend
+                              ? Icons.person_remove
+                              : Icons.person_add,
+                          color: secondaryColor,
                         ),
-                ),
+                        onPressed: () => _addOrRemoveFriend(),
+                        tooltip:
+                            _alreadyFriend ? 'Remove friend' : 'Add friend',
+                      ),
               ),
-            ],
-          ),
+            ),
+            SizedBox(width: 8),
+          ],
         ),
       ),
     );

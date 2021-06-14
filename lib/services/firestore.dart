@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hoot/models/chat.dart';
 import 'package:hoot/models/hoot_user.dart';
+import 'package:hoot/models/message.dart';
 
 class FirestoreService {
   static FirestoreService _instance;
@@ -121,8 +122,8 @@ class FirestoreService {
   }
 
   Stream<List<Chat>> getChatsStream(String userId) {
-    CollectionReference chats = firestore.collection('chats');
-    return chats
+    CollectionReference chatsCollection = firestore.collection('chats');
+    return chatsCollection
         .where('userIds', arrayContains: userId)
         .snapshots()
         .map((event) {
@@ -137,6 +138,23 @@ class FirestoreService {
         ));
       }
       return chats;
+    });
+  }
+
+  Stream<List<Message>> getMessagesStream(String chatId) {
+    CollectionReference messagesCollection =
+        firestore.collection('chats').doc(chatId).collection('messages');
+    return messagesCollection.snapshots().map((event) {
+      List<Message> messages = [];
+      for (QueryDocumentSnapshot document in event.docs) {
+        Timestamp timestamp = document.get('date');
+        messages.add(Message(
+          senderId: document.get('senderId'),
+          content: document.get('usernames').cast<String>(),
+          date: timestamp.toDate(),
+        ));
+      }
+      return messages;
     });
   }
 }
