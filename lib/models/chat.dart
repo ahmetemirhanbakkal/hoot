@@ -1,6 +1,7 @@
 import 'package:hoot/models/message.dart';
 
 class Chat {
+  String id;
   List<String> userIds;
   List<String> usernames;
   List<Message> messages;
@@ -8,6 +9,7 @@ class Chat {
   DateTime lastMessageDate;
 
   Chat({
+    this.id,
     this.userIds,
     this.usernames,
     this.messages,

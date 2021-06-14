@@ -16,9 +16,9 @@ class FirestoreService {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future<String> createUser(String id, String username, String email) async {
-    CollectionReference users = firestore.collection('users');
+    CollectionReference usersCollection = firestore.collection('users');
     try {
-      await users.doc(id).set({
+      await usersCollection.doc(id).set({
         'username': username,
         'email': email,
         'friendIds': [],
@@ -30,9 +30,9 @@ class FirestoreService {
   }
 
   Future getUserDetails(HootUser user) async {
-    CollectionReference users = firestore.collection('users');
+    CollectionReference usersCollection = firestore.collection('users');
     try {
-      DocumentSnapshot document = await users.doc(user.id).get();
+      DocumentSnapshot document = await usersCollection.doc(user.id).get();
       user.username = document.get('username');
       user.friendIds = document.get('friendIds').cast<String>();
       return null;
@@ -70,9 +70,9 @@ class FirestoreService {
     String friendId,
     bool alreadyFriend,
   ) async {
-    CollectionReference users = firestore.collection('users');
+    CollectionReference usersCollection = firestore.collection('users');
     try {
-      await users.doc(userId).update({
+      await usersCollection.doc(userId).update({
         'friendIds': alreadyFriend
             ? FieldValue.arrayRemove([friendId])
             : FieldValue.arrayUnion([friendId]),
@@ -106,14 +106,15 @@ class FirestoreService {
     }
   }
 
-  Future createChat(Chat chat) async {
-    CollectionReference chats = firestore.collection('chats');
+  Future createChat(Chat chat, String userId) async {
+    CollectionReference chatsCollection = firestore.collection('chats');
     try {
-      await chats.add({
+      await chatsCollection.add({
         'userIds': chat.userIds,
         'usernames': chat.usernames,
         'lastMessage': chat.lastMessage,
-        'lastMessageDate': chat.lastMessageDate,
+        'lastMessageSenderId': userId,
+        'lastMessageDate': Timestamp.now(),
       });
       return null;
     } on FirebaseException catch (e) {
@@ -121,40 +122,92 @@ class FirestoreService {
     }
   }
 
+  Future updateChat(String chatId, String lastMessage, String userId) async {
+    CollectionReference chatsCollection = firestore.collection('chats');
+    try {
+      await chatsCollection.doc(chatId).update({
+        'lastMessage': lastMessage,
+        'lastMessageSenderId': userId,
+        'lastMessageDate': Timestamp.now(),
+      });
+      return null;
+    } on FirebaseException catch (e) {
+      return e.message;
+    }
+  }
+
+  Chat _chatFromSnapshot(DocumentSnapshot document) {
+    Timestamp lastMessageTimestamp = document.get('lastMessageDate');
+    return Chat(
+      id: document.id,
+      userIds: document.get('userIds').cast<String>(),
+      usernames: document.get('usernames').cast<String>(),
+      lastMessage: document.get('lastMessage'),
+      lastMessageDate: lastMessageTimestamp.toDate(),
+    );
+  }
+
   Stream<List<Chat>> getChatsStream(String userId) {
     CollectionReference chatsCollection = firestore.collection('chats');
     return chatsCollection
+        .orderBy('lastMessageDate', descending: true)
         .where('userIds', arrayContains: userId)
         .snapshots()
         .map((event) {
       List<Chat> chats = [];
       for (QueryDocumentSnapshot document in event.docs) {
-        Timestamp lastMessageTimestamp = document.get('lastMessageDate');
-        chats.add(Chat(
-          userIds: document.get('userIds').cast<String>(),
-          usernames: document.get('usernames').cast<String>(),
-          lastMessage: document.get('lastMessage'),
-          lastMessageDate: lastMessageTimestamp.toDate(),
-        ));
+        chats.add(_chatFromSnapshot(document));
       }
       return chats;
     });
   }
 
+  Future getChat(String loggedUserId, String targetUserId) async {
+    CollectionReference chatsCollection = firestore.collection('chats');
+    try {
+      QuerySnapshot querySnapshot = await chatsCollection
+          .where('userIds', arrayContains: loggedUserId)
+          .get();
+      if (querySnapshot.docs.isEmpty) return null;
+      for (QueryDocumentSnapshot document in querySnapshot.docs) {
+        List<String> userIds = document.get('userIds').cast<String>();
+        if (userIds.contains(targetUserId)) return _chatFromSnapshot(document);
+      }
+    } on FirebaseException catch (e) {
+      return e.message;
+    }
+  }
+
   Stream<List<Message>> getMessagesStream(String chatId) {
     CollectionReference messagesCollection =
         firestore.collection('chats').doc(chatId).collection('messages');
-    return messagesCollection.snapshots().map((event) {
+    return messagesCollection.orderBy('date').snapshots().map((event) {
       List<Message> messages = [];
       for (QueryDocumentSnapshot document in event.docs) {
         Timestamp timestamp = document.get('date');
         messages.add(Message(
+          id: document.id,
           senderId: document.get('senderId'),
-          content: document.get('usernames').cast<String>(),
+          content: document.get('content'),
           date: timestamp.toDate(),
         ));
       }
       return messages;
     });
+  }
+
+  Future sendMessage(String chatId, Message message) async {
+    CollectionReference messagesCollection =
+        firestore.collection('chats').doc(chatId).collection('messages');
+    try {
+      await messagesCollection.add({
+        'senderId': message.senderId,
+        'content': message.content,
+        'date': message.date,
+      });
+      return null;
+    } on FirebaseException catch (e) {
+      return e.message;
+    }
   }
 }

@@ -20,15 +20,11 @@ class _ChatCardViewState extends State<ChatCardView> {
   String _chatName;
 
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
     _chatName = widget.chat.userIds[0] == widget.loggedUser.id
         ? widget.chat.usernames[1]
         : widget.chat.usernames[0];
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Container(
       child: InkWell(
         onTap: () {
