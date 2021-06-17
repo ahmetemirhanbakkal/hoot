@@ -3,6 +3,7 @@ import 'package:hoot/assets/globals.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/pages/chats.dart';
 import 'package:hoot/pages/friends.dart';
+import 'package:hoot/pages/profile.dart';
 
 class Destination {
   static const String chats = 'Chats';
@@ -56,8 +57,10 @@ class _DestinationViewState extends State<DestinationView> {
         return ChatsPage(loggedUser: widget.destination.loggedUser);
       case Destination.friends:
         return FriendsPage(loggedUser: widget.destination.loggedUser);
+      case Destination.profile:
+        return ProfilePage(loggedUser: widget.destination.loggedUser);
       default:
-        return Center(child: Text(widget.destination.title));
+        return null;
     }
   }
 }

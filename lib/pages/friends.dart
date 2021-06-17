@@ -21,7 +21,7 @@ class _FriendsPageState extends State<FriendsPage> {
     if (error == null)
       setState(() {});
     else
-      buildErrorSnackBar(error, context);
+      showErrorSnackBar(error, context);
   }
 
   @override

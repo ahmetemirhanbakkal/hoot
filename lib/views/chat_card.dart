@@ -48,7 +48,10 @@ class _ChatCardViewState extends State<ChatCardView> {
                       style: Theme.of(context).textTheme.headline6,
                     ),
                     SizedBox(height: 4),
-                    Text(widget.chat.lastMessage),
+                    Text(
+                      widget.chat.lastMessage,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),

@@ -64,11 +64,6 @@ class _HomePageState extends State<HomePage> {
               tooltip: 'Search',
             ),
             IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {},
-              tooltip: 'Settings',
-            ),
-            IconButton(
               icon: Icon(Icons.logout),
               onPressed: () => _onSignOutPressed(),
               tooltip: 'Logout',
@@ -129,7 +124,7 @@ class _HomePageState extends State<HomePage> {
     if (authError == null) {
       Navigator.pushReplacementNamed(context, '/login');
     } else {
-      buildErrorSnackBar(authError, context);
+      showErrorSnackBar(authError, context);
     }
   }
 }

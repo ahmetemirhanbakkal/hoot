@@ -21,7 +21,7 @@ final ButtonStyle textButtonStyle = ButtonStyle(
   ),
 );
 
-void buildErrorSnackBar(String message, BuildContext context) {
+void showErrorSnackBar(String message, BuildContext context) {
   SnackBar snackBar = SnackBar(
     backgroundColor: errorColor,
     content: Text(

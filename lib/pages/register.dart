@@ -167,11 +167,11 @@ class _RegisterPageState extends State<RegisterPage> {
             arguments: args,
           );
         } else {
-          buildErrorSnackBar(firestoreError, context);
+          showErrorSnackBar(firestoreError, context);
         }
       } else {
         Navigator.pop(context);
-        buildErrorSnackBar(result, context);
+        showErrorSnackBar(result, context);
       }
     }
   }

@@ -150,8 +150,8 @@ class FirestoreService {
   Stream<List<Chat>> getChatsStream(String userId) {
     CollectionReference chatsCollection = firestore.collection('chats');
     return chatsCollection
-        .orderBy('lastMessageDate', descending: true)
         .where('userIds', arrayContains: userId)
+        .orderBy('lastMessageDate', descending: true)
         .snapshots()
         .map((event) {
       List<Chat> chats = [];
@@ -181,7 +181,10 @@ class FirestoreService {
   Stream<List<Message>> getMessagesStream(String chatId) {
     CollectionReference messagesCollection =
         firestore.collection('chats').doc(chatId).collection('messages');
-    return messagesCollection.orderBy('date').snapshots().map((event) {
+    return messagesCollection
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map((event) {
       List<Message> messages = [];
       for (QueryDocumentSnapshot document in event.docs) {
         Timestamp timestamp = document.get('date');

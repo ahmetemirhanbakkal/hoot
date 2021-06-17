@@ -37,7 +37,7 @@ class _SearchPageState extends State<SearchPage> {
           ],
           title: _buildSearchField(),
           bottom: PreferredSize(
-            preferredSize: Size.fromHeight(4),
+            preferredSize: Size.fromHeight(2),
             child: _isSearching ? LinearProgressIndicator() : Container(),
           ),
         ),

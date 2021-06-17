@@ -143,10 +143,10 @@ class _LoginPageState extends State<LoginPage> {
           Map args = {'user': authResult};
           Navigator.pushReplacementNamed(context, '/home', arguments: args);
         } else {
-          buildErrorSnackBar(firestoreResult, context);
+          showErrorSnackBar(firestoreResult, context);
         }
       } else {
-        buildErrorSnackBar(authResult, context);
+        showErrorSnackBar(authResult, context);
       }
     }
   }

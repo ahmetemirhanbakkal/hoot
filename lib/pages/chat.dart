@@ -60,13 +60,18 @@ class _ChatPageState extends State<ChatPage> {
         stream: _firestore.getMessagesStream(_chat.id),
         builder: (context, snapshot) {
           if (snapshot.hasData) _messages = snapshot.data;
-          return ListView.builder(
+          return ListView.separated(
+            padding: EdgeInsets.all(smallPadding),
+            reverse: true,
             itemBuilder: (context, index) {
               return MessageCardView(
                 loggedUser: _loggedUser,
                 message: _messages[index],
               );
             },
+            separatorBuilder: (context, index) => SizedBox(
+              height: smallPadding,
+            ),
             itemCount: _messages.length,
           );
         },
