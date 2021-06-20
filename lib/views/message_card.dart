@@ -8,14 +8,39 @@ import 'package:intl/intl.dart';
 class MessageCardView extends StatelessWidget {
   final HootUser loggedUser;
   final Message message;
+  final bool includeDate;
 
-  MessageCardView({this.loggedUser, this.message});
+  MessageCardView({this.loggedUser, this.message, this.includeDate});
 
   @override
   Widget build(BuildContext context) {
-    return message.senderId == loggedUser.id
-        ? buildLoggedUserMessage()
-        : buildTargetUserMessage();
+    return Column(
+      children: [
+        if (includeDate) buildDate(),
+        message.senderId == loggedUser.id
+            ? buildLoggedUserMessage()
+            : buildTargetUserMessage(),
+      ],
+    );
+  }
+
+  Widget buildDate() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: smallPadding),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(largeRadius),
+        child: Container(
+          color: primaryColorDark.withOpacity(0.5),
+          child: Padding(
+            padding: EdgeInsets.all(smallPadding),
+            child: Text(
+              DateFormat.MMMMd('en').format(message.date),
+              style: TextStyle(color: secondaryColor),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget buildLoggedUserMessage() {

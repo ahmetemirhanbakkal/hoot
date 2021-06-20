@@ -4,6 +4,8 @@ import 'package:hoot/assets/constants.dart';
 import 'package:hoot/assets/globals.dart';
 import 'package:hoot/models/chat.dart';
 import 'package:hoot/models/hoot_user.dart';
+import 'package:hoot/services/storage.dart';
+import 'package:hoot/views/profile_image.dart';
 import 'package:intl/intl.dart';
 
 class ChatCardView extends StatefulWidget {
@@ -17,14 +19,25 @@ class ChatCardView extends StatefulWidget {
 }
 
 class _ChatCardViewState extends State<ChatCardView> {
+  final StorageService _storage = StorageService.getInstance();
   String _chatName;
+  String _imageUrl;
+  String _targetUserId;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _chatName = widget.chat.userIds[0] == widget.loggedUser.id
         ? widget.chat.usernames[1]
         : widget.chat.usernames[0];
+    _targetUserId = widget.chat.userIds[0] == widget.loggedUser.id
+        ? widget.chat.userIds[1]
+        : widget.chat.userIds[0];
+    _getProfileImage();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Container(
       child: InkWell(
         onTap: () {
@@ -35,8 +48,9 @@ class _ChatCardViewState extends State<ChatCardView> {
           Navigator.pushNamed(homeContext, '/chat', arguments: args);
         },
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(width: smallPadding),
+            ProfileImageView(imageUrl: _imageUrl, imageSize: 52),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(largePadding),
@@ -80,5 +94,10 @@ class _ChatCardViewState extends State<ChatCardView> {
         ),
       ),
     );
+  }
+
+  void _getProfileImage() async {
+    _imageUrl = await _storage.getProfileImageUrl(_targetUserId);
+    setState(() {});
   }
 }

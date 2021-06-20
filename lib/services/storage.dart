@@ -22,4 +22,16 @@ class StorageService {
       return e.message;
     }
   }
+
+  Future getProfileImageUrl(String userId) async {
+    if (userId == null) return null;
+    Reference reference = _storage.ref('profiles/$userId');
+
+    try {
+      return await reference.getDownloadURL();
+    } on FirebaseException catch (e) {
+      print(e.message);
+      return null;
+    }
+  }
 }

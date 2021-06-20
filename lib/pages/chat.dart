@@ -5,7 +5,9 @@ import 'package:hoot/models/chat.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/models/message.dart';
 import 'package:hoot/services/firestore.dart';
+import 'package:hoot/services/storage.dart';
 import 'package:hoot/views/message_card.dart';
+import 'package:hoot/views/profile_image.dart';
 
 class ChatPage extends StatefulWidget {
   @override
@@ -14,12 +16,17 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   FirestoreService _firestore = FirestoreService.getInstance();
+  final StorageService _storage = StorageService.getInstance();
   HootUser _loggedUser, _targetUser;
   Chat _chat;
   String _chatName;
+  String _targetUserId;
   bool _chatRetrieved = false;
   String _inputContent = '';
   TextEditingController _inputController = TextEditingController();
+
+  String _imageUrl;
+  bool _imageRequested = false;
 
   List<Message> _messages = [];
 
@@ -32,16 +39,33 @@ class _ChatPageState extends State<ChatPage> {
 
     if (_chat == null) {
       _chatName = _targetUser.username;
+      _targetUserId = _targetUser.id;
       if (!_chatRetrieved) getChat();
     } else {
       _chatName = _chat.userIds[0] == _loggedUser.id
           ? _chat.usernames[1]
           : _chat.usernames[0];
+      _targetUserId = _chat.userIds[0] == _loggedUser.id
+          ? _chat.userIds[1]
+          : _chat.userIds[0];
+    }
+
+    if (!_imageRequested) {
+      _getProfileImage();
+      _imageRequested = true;
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_chatName),
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            ProfileImageView(imageUrl: _imageUrl, imageSize: 40),
+            SizedBox(width: smallPadding),
+            Flexible(child: Text(_chatName)),
+            SizedBox(width: smallPadding),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -64,9 +88,13 @@ class _ChatPageState extends State<ChatPage> {
             padding: EdgeInsets.all(smallPadding),
             reverse: true,
             itemBuilder: (context, index) {
+              Message prevMessage = index > 1 ? _messages[index - 1] : null;
+              Message message = _messages[index];
               return MessageCardView(
                 loggedUser: _loggedUser,
-                message: _messages[index],
+                message: message,
+                includeDate: prevMessage == null ||
+                    !isSameDate(prevMessage.date, message.date),
               );
             },
             separatorBuilder: (context, index) => SizedBox(
@@ -77,6 +105,10 @@ class _ChatPageState extends State<ChatPage> {
         },
       );
     }
+  }
+
+  bool isSameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
   Widget buildMessageBar() {
@@ -161,5 +193,10 @@ class _ChatPageState extends State<ChatPage> {
       date: DateTime.now(),
     );
     await _firestore.sendMessage(_chat.id, message);
+  }
+
+  void _getProfileImage() async {
+    _imageUrl = await _storage.getProfileImageUrl(_targetUserId);
+    setState(() {});
   }
 }
