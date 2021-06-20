@@ -54,7 +54,7 @@ class _UserCardViewState extends State<UserCardView> {
               height: 56,
               width: 56,
               child: AnimatedSwitcher(
-                duration: Duration(milliseconds: fastAnimDuration),
+                duration: fastAnimDuration,
                 child: _loading
                     ? CircularProgressIndicator()
                     : IconButton(

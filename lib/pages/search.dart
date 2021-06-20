@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hoot/assets/colors.dart';
+import 'package:hoot/assets/constants.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/services/firestore.dart';
 import 'package:hoot/views/user_list.dart';
@@ -33,17 +34,25 @@ class _SearchPageState extends State<SearchPage> {
               IconButton(
                 icon: const Icon(Icons.clear),
                 onPressed: () => _clearSearchQuery(),
+                tooltip: 'Clear',
               ),
           ],
           title: _buildSearchField(),
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(2),
-            child: _isSearching ? LinearProgressIndicator() : Container(),
-          ),
         ),
-        body: UserListView(
-          loggedUser: _loggedUser,
-          users: _users,
+        body: Stack(
+          children: [
+            UserListView(
+              loggedUser: _loggedUser,
+              users: _users,
+            ),
+            AnimatedOpacity(
+              duration: fastAnimDuration,
+              opacity: _isSearching ? 1 : 0,
+              child: LinearProgressIndicator(
+                backgroundColor: Colors.transparent,
+              ),
+            ),
+          ],
         ),
       ),
     );
