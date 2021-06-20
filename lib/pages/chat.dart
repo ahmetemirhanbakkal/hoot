@@ -75,6 +75,7 @@ class _ChatPageState extends State<ChatPage> {
                 message: message,
                 includeDate: prevMessage == null ||
                     !isSameDate(prevMessage.date, message.date),
+                chatId: _chat.id,
               );
             },
             separatorBuilder: (context, index) => SizedBox(

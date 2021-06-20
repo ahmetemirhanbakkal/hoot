@@ -68,7 +68,7 @@ class _ChatCardViewState extends State<ChatCardView> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    DateFormat.MMMMd('en').format(widget.chat.lastMessageDate),
+                    getDateString(widget.chat.lastMessageDate),
                     style: TextStyle(color: secondaryColor),
                   ),
                   SizedBox(height: 4),

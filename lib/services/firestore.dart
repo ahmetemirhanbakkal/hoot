@@ -128,7 +128,7 @@ class FirestoreService {
         'profileImages': chat.profileImages,
         'lastMessage': chat.lastMessage,
         'lastMessageSenderId': userId,
-        'lastMessageDate': Timestamp.now(),
+        'lastMessageDate': FieldValue.serverTimestamp(),
       });
       chat.id = document.id;
       return null;
@@ -143,7 +143,7 @@ class FirestoreService {
       await chatsCollection.doc(chatId).update({
         'lastMessage': lastMessage,
         'lastMessageSenderId': userId,
-        'lastMessageDate': Timestamp.now(),
+        'lastMessageDate': FieldValue.serverTimestamp(),
       });
       return null;
     } on FirebaseException catch (e) {
@@ -222,8 +222,19 @@ class FirestoreService {
       await messagesCollection.add({
         'senderId': message.senderId,
         'content': message.content,
-        'date': message.date,
+        'date': FieldValue.serverTimestamp(),
       });
+      return null;
+    } on FirebaseException catch (e) {
+      return e.message;
+    }
+  }
+
+  Future deleteMessage(String chatId, String messageId) async {
+    CollectionReference messagesCollection =
+        firestore.collection('chats').doc(chatId).collection('messages');
+    try {
+      await messagesCollection.doc(messageId).delete();
       return null;
     } on FirebaseException catch (e) {
       return e.message;
