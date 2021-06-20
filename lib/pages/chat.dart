@@ -5,7 +5,6 @@ import 'package:hoot/models/chat.dart';
 import 'package:hoot/models/hoot_user.dart';
 import 'package:hoot/models/message.dart';
 import 'package:hoot/services/firestore.dart';
-import 'package:hoot/services/storage.dart';
 import 'package:hoot/views/message_card.dart';
 import 'package:hoot/views/profile_image.dart';
 
@@ -16,17 +15,11 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   FirestoreService _firestore = FirestoreService.getInstance();
-  final StorageService _storage = StorageService.getInstance();
   HootUser _loggedUser, _targetUser;
   Chat _chat;
-  String _chatName;
-  String _targetUserId;
   bool _chatRetrieved = false;
   String _inputContent = '';
   TextEditingController _inputController = TextEditingController();
-
-  String _imageUrl;
-  bool _imageRequested = false;
 
   List<Message> _messages = [];
 
@@ -38,21 +31,7 @@ class _ChatPageState extends State<ChatPage> {
     _chat ??= args['chat'];
 
     if (_chat == null) {
-      _chatName = _targetUser.username;
-      _targetUserId = _targetUser.id;
       if (!_chatRetrieved) getChat();
-    } else {
-      _chatName = _chat.userIds[0] == _loggedUser.id
-          ? _chat.usernames[1]
-          : _chat.usernames[0];
-      _targetUserId = _chat.userIds[0] == _loggedUser.id
-          ? _chat.userIds[1]
-          : _chat.userIds[0];
-    }
-
-    if (!_imageRequested) {
-      _getProfileImage();
-      _imageRequested = true;
     }
 
     return Scaffold(
@@ -60,9 +39,9 @@ class _ChatPageState extends State<ChatPage> {
         titleSpacing: 0,
         title: Row(
           children: [
-            ProfileImageView(imageUrl: _imageUrl, imageSize: 40),
+            ProfileImageView(imageUrl: _targetUser.profileImage, imageSize: 40),
             SizedBox(width: smallPadding),
-            Flexible(child: Text(_chatName)),
+            Flexible(child: Text(_targetUser.username)),
             SizedBox(width: smallPadding),
           ],
         ),
@@ -88,8 +67,9 @@ class _ChatPageState extends State<ChatPage> {
             padding: EdgeInsets.all(smallPadding),
             reverse: true,
             itemBuilder: (context, index) {
-              Message prevMessage = index > 1 ? _messages[index - 1] : null;
               Message message = _messages[index];
+              Message prevMessage =
+                  message == _messages.last ? null : _messages[index + 1];
               return MessageCardView(
                 loggedUser: _loggedUser,
                 message: message,
@@ -133,6 +113,8 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     contentPadding: EdgeInsets.all(largePadding),
                   ),
+                  onSubmitted: (message) => onSendMessage(),
+                  textInputAction: TextInputAction.send,
                 ),
               ),
               SizedBox(width: 4),
@@ -165,6 +147,7 @@ class _ChatPageState extends State<ChatPage> {
       _chat = Chat(
         userIds: [_loggedUser.id, _targetUser.id],
         usernames: [_loggedUser.username, _targetUser.username],
+        profileImages: [_loggedUser.profileImage, _targetUser.profileImage],
         lastMessage: messageContent,
         lastMessageDate: DateTime.now(),
       );
@@ -193,10 +176,6 @@ class _ChatPageState extends State<ChatPage> {
       date: DateTime.now(),
     );
     await _firestore.sendMessage(_chat.id, message);
-  }
-
-  void _getProfileImage() async {
-    _imageUrl = await _storage.getProfileImageUrl(_targetUserId);
     setState(() {});
   }
 }

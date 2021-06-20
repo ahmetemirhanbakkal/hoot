@@ -18,7 +18,7 @@ class _UserListViewState extends State<UserListView> {
     return ListView.separated(
       itemBuilder: (context, index) {
         HootUser user = widget.users[index];
-        return UserCardView(loggedUser: widget.loggedUser, user: user);
+        return UserCardView(loggedUser: widget.loggedUser, targetUser: user);
       },
       separatorBuilder: (context, index) => SizedBox(height: 4),
       itemCount: widget.users.length,

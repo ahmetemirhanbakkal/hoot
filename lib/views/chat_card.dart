@@ -4,7 +4,6 @@ import 'package:hoot/assets/constants.dart';
 import 'package:hoot/assets/globals.dart';
 import 'package:hoot/models/chat.dart';
 import 'package:hoot/models/hoot_user.dart';
-import 'package:hoot/services/storage.dart';
 import 'package:hoot/views/profile_image.dart';
 import 'package:intl/intl.dart';
 
@@ -19,38 +18,31 @@ class ChatCardView extends StatefulWidget {
 }
 
 class _ChatCardViewState extends State<ChatCardView> {
-  final StorageService _storage = StorageService.getInstance();
-  String _chatName;
-  String _imageUrl;
-  String _targetUserId;
-
-  @override
-  void initState() {
-    super.initState();
-    _chatName = widget.chat.userIds[0] == widget.loggedUser.id
-        ? widget.chat.usernames[1]
-        : widget.chat.usernames[0];
-    _targetUserId = widget.chat.userIds[0] == widget.loggedUser.id
-        ? widget.chat.userIds[1]
-        : widget.chat.userIds[0];
-    _getProfileImage();
-  }
+  HootUser _targetUser;
 
   @override
   Widget build(BuildContext context) {
+    int targetIndex = widget.chat.userIds[0] == widget.loggedUser.id ? 1 : 0;
+    _targetUser = HootUser(
+      id: widget.chat.userIds[targetIndex],
+      username: widget.chat.usernames[targetIndex],
+      profileImage: widget.chat.profileImages[targetIndex],
+    );
+
     return Container(
       child: InkWell(
         onTap: () {
           Map args = {
             'chat': widget.chat,
             'logged_user': widget.loggedUser,
+            'target_user': _targetUser
           };
           Navigator.pushNamed(homeContext, '/chat', arguments: args);
         },
         child: Row(
           children: [
             SizedBox(width: smallPadding),
-            ProfileImageView(imageUrl: _imageUrl, imageSize: 52),
+            ProfileImageView(imageUrl: _targetUser.profileImage, imageSize: 52),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(largePadding),
@@ -58,7 +50,7 @@ class _ChatCardViewState extends State<ChatCardView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _chatName,
+                      _targetUser.username,
                       style: Theme.of(context).textTheme.headline6,
                     ),
                     SizedBox(height: 4),
@@ -94,10 +86,5 @@ class _ChatCardViewState extends State<ChatCardView> {
         ),
       ),
     );
-  }
-
-  void _getProfileImage() async {
-    _imageUrl = await _storage.getProfileImageUrl(_targetUserId);
-    setState(() {});
   }
 }

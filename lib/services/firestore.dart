@@ -22,6 +22,7 @@ class FirestoreService {
         'username': username,
         'email': email,
         'friendIds': [],
+        'profileImage': null,
       });
       return null;
     } on FirebaseException catch (e) {
@@ -35,6 +36,18 @@ class FirestoreService {
       DocumentSnapshot document = await usersCollection.doc(user.id).get();
       user.username = document.get('username');
       user.friendIds = document.get('friendIds').cast<String>();
+      user.profileImage = document.get('profileImage');
+      return null;
+    } on FirebaseException catch (e) {
+      return e.message;
+    }
+  }
+
+  Future updateProfileImage(HootUser user, String imageUrl) async {
+    CollectionReference usersCollection = firestore.collection('users');
+    try {
+      await usersCollection.doc(user.id).update({'profileImage': imageUrl});
+      user.profileImage = imageUrl;
       return null;
     } on FirebaseException catch (e) {
       return e.message;
@@ -52,12 +65,7 @@ class FirestoreService {
           .get();
       for (QueryDocumentSnapshot document in querySnapshot.docs) {
         if (document.id == loggedUserId) continue;
-        users.add(HootUser(
-          id: document.id,
-          username: document.get('username'),
-          email: document.get('email'),
-          friendIds: document.get('friendIds').cast<String>(),
-        ));
+        users.add(_userFromSnapshot(document));
       }
       return users;
     } on FirebaseException catch (e) {
@@ -83,6 +91,16 @@ class FirestoreService {
     }
   }
 
+  HootUser _userFromSnapshot(DocumentSnapshot document) {
+    return HootUser(
+      id: document.id,
+      username: document.get('username'),
+      email: document.get('email'),
+      friendIds: document.get('friendIds').cast<String>(),
+      profileImage: document.get('profileImage'),
+    );
+  }
+
   Future getFriends(HootUser loggedUser) async {
     List<HootUser> users = [];
     loggedUser.friends = users;
@@ -93,12 +111,7 @@ class FirestoreService {
           .where(FieldPath.documentId, whereIn: loggedUser.friendIds)
           .get();
       for (QueryDocumentSnapshot document in querySnapshot.docs) {
-        users.add(HootUser(
-          id: document.id,
-          username: document.get('username'),
-          email: document.get('email'),
-          friendIds: document.get('friendIds').cast<String>(),
-        ));
+        users.add(_userFromSnapshot(document));
       }
       return null;
     } on FirebaseException catch (e) {
@@ -109,13 +122,15 @@ class FirestoreService {
   Future createChat(Chat chat, String userId) async {
     CollectionReference chatsCollection = firestore.collection('chats');
     try {
-      await chatsCollection.add({
+      DocumentReference document = await chatsCollection.add({
         'userIds': chat.userIds,
         'usernames': chat.usernames,
+        'profileImages': chat.profileImages,
         'lastMessage': chat.lastMessage,
         'lastMessageSenderId': userId,
         'lastMessageDate': Timestamp.now(),
       });
+      chat.id = document.id;
       return null;
     } on FirebaseException catch (e) {
       return e.message;
@@ -142,6 +157,7 @@ class FirestoreService {
       id: document.id,
       userIds: document.get('userIds').cast<String>(),
       usernames: document.get('usernames').cast<String>(),
+      profileImages: document.get('profileImages').cast<String>(),
       lastMessage: document.get('lastMessage'),
       lastMessageDate: lastMessageTimestamp.toDate(),
     );

@@ -161,9 +161,10 @@ class _RegisterPageState extends State<RegisterPage> {
           result.username = _username;
           result.friendIds = [];
           Map args = {'user': result};
-          Navigator.pushReplacementNamed(
+          Navigator.pushNamedAndRemoveUntil(
             context,
             '/home',
+            (Route route) => false,
             arguments: args,
           );
         } else {

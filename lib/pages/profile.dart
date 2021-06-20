@@ -5,6 +5,7 @@ import 'package:hoot/assets/colors.dart';
 import 'package:hoot/assets/constants.dart';
 import 'package:hoot/assets/styles.dart';
 import 'package:hoot/models/hoot_user.dart';
+import 'package:hoot/services/firestore.dart';
 import 'package:hoot/services/storage.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,17 +20,11 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String _imageUrl;
-  final ImagePicker _picker = ImagePicker();
   final StorageService _storage = StorageService.getInstance();
+  final FirestoreService _firestore = FirestoreService.getInstance();
+  final ImagePicker _picker = ImagePicker();
   bool _imageLoading = false;
   final double _imageSize = 200;
-
-  @override
-  void initState() {
-    super.initState();
-    _getProfileImage();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +43,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      if (_imageUrl != null)
+                      if (widget.loggedUser.profileImage != null)
                         Image.network(
-                          _imageUrl,
+                          widget.loggedUser.profileImage,
                           fit: BoxFit.cover,
                           height: _imageSize,
                           width: _imageSize,
@@ -114,17 +109,14 @@ class _ProfilePageState extends State<ProfilePage> {
       String error =
           await _storage.uploadProfileImage(widget.loggedUser.id, image);
       if (error == null) {
-        await _getProfileImage();
+        String imageUrl =
+            await _storage.getProfileImageUrl(widget.loggedUser.id);
+        await _firestore.updateProfileImage(widget.loggedUser, imageUrl);
       } else {
         showErrorSnackBar(error, context);
       }
-      setState(() => _imageLoading = false);
     }
-  }
 
-  Future _getProfileImage() async {
-    setState(() => _imageLoading = true);
-    _imageUrl = await _storage.getProfileImageUrl(widget.loggedUser.id);
     setState(() => _imageLoading = false);
   }
 }
